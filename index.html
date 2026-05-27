@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODOH CALCULATOR</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #fff;
+      min-height: 100vh;
+      padding: 15px;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .warning {
+      background: #ff4444;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 5px;
+      color: #ffd700;
+    }
+    .subtitle {
+      color: #aaa;
+      font-size: 15px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+      color: #ddd;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+    input:focus {
+      outline: 2px solid #ffd700;
+    }
+
+    .result {
+      background: rgba(255,215,0,0.15);
+      border: 1px solid #ffd700;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 10px;
+    }
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 14px 0;
+      font-size: 17px;
+    }
+    .result-label {
+      color: #ddd;
+    }
+    .result-value {
+      font-weight: bold;
+      color: #ffd700;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      background: #ffd700;
+      color: #1e1e2e;
+      border: none;
+      border-radius: 12px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .note {
+      font-size: 13px;
+      color: #888;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="warning">⚠️ 仅限内部使用，不可给人头！</div>
+      <h1>BODOH CALCULATOR</h1>
+      <p class="subtitle">简单粗暴贷款计算器</p>
+    </header>
+
+    <div class="card">
+      <label>贷款金额 (RM)</label>
+      <input type="number" id="amount" placeholder="例如：3000" value="3000">
+
+      <label>年利率 (%)</label>
+      <input type="number" id="rate" step="0.01" placeholder="例如：3.85" value="3.85">
+
+      <label>贷款年限 (年)</label>
+      <input type="number" id="tenure" placeholder="例如：5" value="5">
+
+      <button onclick="calculate()">立即计算</button>
+    </div>
+
+    <div class="card result" id="result" style="display: none;">
+      <div class="result-item">
+        <span class="result-label">每月还款</span>
+        <span class="result-value" id="monthly">RM 0</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">总还款金额</span>
+        <span class="result-value" id="total">RM 0</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">总利息</span>
+        <span class="result-value" id="interest">RM 0</span>
+      </div>
+    </div>
+
+    <div class="note">
+      ※ 本计算器使用简单利息公式（非等额本息）<br>
+      实际银行贷款多采用等额本息，利息会比这个低
+    </div>
+  </div>
+
+  <script>
+    function formatCurrency(num) {
+      return 'RM ' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    function calculate() {
+      const amount = parseFloat(document.getElementById('amount').value) || 0;
+      const rate = parseFloat(document.getElementById('rate').value) || 0;
+      const tenure = parseFloat(document.getElementById('tenure').value) || 0;
+
+      if (amount <= 0 || rate <= 0 || tenure <= 0) {
+        alert('请填写完整且正确的数值');
+        return;
+      }
+
+      const totalInterest = amount * (rate / 100) * tenure;
+      const totalPayment = amount + totalInterest;
+      const monthlyPayment = totalPayment / (tenure * 12);
+
+      document.getElementById('monthly').textContent = formatCurrency(monthlyPayment);
+      document.getElementById('total').textContent = formatCurrency(totalPayment);
+      document.getElementById('interest').textContent = formatCurrency(totalInterest);
+      document.getElementById('result').style.display = 'block';
+    }
+
+    // 实时计算
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', calculate);
+    });
+
+    // 页面加载完自动算一次
+    window.onload = calculate;
+  </script>
+</body>
+</html>
